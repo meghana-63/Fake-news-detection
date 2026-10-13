@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../model"
+		},
+		{
+			"path": "../static"
+		},
+		{
+			"path": "../templates"
+		},
+		{
+			"path": "../venv"
+		}
+	]
+}

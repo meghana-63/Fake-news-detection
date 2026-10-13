@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TruthLens AI | Fake News Detection</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Background effects -->
+    <div class="background-grid"></div>
+    <div class="glow glow-one"></div>
+    <div class="glow glow-two"></div>
+
+    <div class="page">
+
+        <!-- ================= HEADER ================= -->
+
+        <header class="topbar">
+
+            <div class="brand">
+
+                <div class="brand-logo">
+                    <span>TL</span>
+                </div>
+
+                <div class="brand-text">
+                    <h1>TRUTHLENS <span>AI</span></h1>
+                    <p>INTELLIGENT NEWS ANALYSIS</p>
+                </div>
+
+            </div>
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>AI SYSTEM ONLINE</span>
+            </div>
+
+        </header>
+
+
+        <!-- ================= HERO ================= -->
+
+        <main>
+
+            <section class="hero">
+
+                <div class="hero-tag">
+                    <span class="tag-line"></span>
+                    AI-POWERED CLASSIFICATION
+                    <span class="tag-line"></span>
+                </div>
+
+                <h2>
+    FAKE NEWS
+    <span>DETECTION SYSTEM</span>
+</h2>
+
+                <p class="hero-description">
+                    Analyze news content using Natural Language Processing,
+                    TF-IDF and Machine Learning.
+                </p>
+
+            </section>
+
+
+            <!-- ================= INPUT CARD ================= -->
+
+            <section class="analysis-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <p class="section-number">01 / INPUT</p>
+                        <h3>Enter News Content</h3>
+                    </div>
+
+                    <div class="terminal-icon">
+                        &gt;_
+                    </div>
+
+                </div>
+
+
+                <form action="/predict" method="POST">
+
+                    <div class="input-wrapper">
+
+                        <div class="input-top">
+
+                            <span class="input-label">
+                                NEWS CONTENT
+                            </span>
+
+                            <span class="input-hint">
+                                TEXT ANALYSIS
+                            </span>
+
+                        </div>
+
+                        <textarea
+                            name="news"
+                            id="news"
+                            placeholder="Paste a complete news headline or article here..."
+                            required>{{ request.form.get('news', '') }}</textarea>
+
+                        <div class="input-bottom">
+
+                            <span>
+                                NLP ENGINE READY
+                            </span>
+
+                            <span id="wordCounter">
+                                0 WORDS
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="submit" class="analyze-button">
+
+                        <span class="button-icon">✦</span>
+
+                        <span>ANALYZE NEWS</span>
+
+                        <span class="arrow">→</span>
+
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- ================= RESULT ================= -->
+
+            {% if prediction %}
+
+            <section class="result-card">
+
+                <div class="result-header">
+
+                    <div>
+                        <p class="section-number">02 / ANALYSIS RESULT</p>
+                        <h3>Classification Complete</h3>
+                    </div>
+
+                    <div class="scan-status">
+                        SCAN COMPLETE
+                    </div>
+
+                </div>
+
+
+                <div class="result-content">
+
+                    <div class="result-icon
+                        {% if 'REAL' in prediction %}
+                            real-icon
+                        {% elif 'FAKE' in prediction %}
+                            fake-icon
+                        {% else %}
+                            uncertain-icon
+                        {% endif %}">
+
+                        {% if 'REAL' in prediction %}
+                            ✓
+                        {% elif 'FAKE' in prediction %}
+                            !
+                        {% else %}
+                            ?
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="result-main">
+
+                        <p class="result-label">
+                            PREDICTION
+                        </p>
+
+                        <h2 class="
+                            {% if 'REAL' in prediction %}
+                                real-text
+                            {% elif 'FAKE' in prediction %}
+                                fake-text
+                            {% else %}
+                                uncertain-text
+                            {% endif %}
+                        ">
+                            {{ prediction }}
+                        </h2>
+
+                        {% if confidence %}
+
+                        <div class="confidence-area">
+
+                            <div class="confidence-title">
+
+                                <span>MODEL CONFIDENCE</span>
+
+                                <strong>{{ confidence }}</strong>
+
+                            </div>
+
+                            <div class="confidence-bar">
+
+                                <div
+                                    class="confidence-fill"
+                                    style="width: {{ confidence }};">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                {% if warning %}
+
+                <div class="warning-box">
+
+                    <span class="warning-symbol">⚠</span>
+
+                    <div>
+                        <strong>INSUFFICIENT INFORMATION</strong>
+                        <p>{{ warning }}</p>
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="result-note">
+
+                    <span>ⓘ</span>
+
+                    <p>
+                        This prediction is generated from patterns learned
+                        from the training dataset. It does not independently
+                        verify facts or guarantee that a claim is true or false.
+                    </p>
+
+                </div>
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- ================= PIPELINE ================= -->
+
+            <section class="pipeline">
+
+                <div class="pipeline-heading">
+
+                    <div>
+                        <p class="section-number">03 / AI PIPELINE</p>
+                        <h3>How TruthLens AI Works</h3>
+                    </div>
+
+                    <span class="pipeline-status">
+                        PROCESSING FLOW
+                    </span>
+
+                </div>
+
+
+                <div class="pipeline-grid">
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            01
+                        </div>
+
+                        <div class="step-icon">
+                            ◈
+                        </div>
+
+                        <h4>INPUT</h4>
+
+                        <p>
+                            News headline or article
+                            is submitted.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            02
+                        </div>
+
+                        <div class="step-icon">
+                            ◌
+                        </div>
+
+                        <h4>PROCESSING</h4>
+
+                        <p>
+                            Text is cleaned and
+                            normalized.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            03
+                        </div>
+
+                        <div class="step-icon">
+                            ⬡
+                        </div>
+
+                        <h4>TF-IDF</h4>
+
+                        <p>
+                            Important text features
+                            are extracted.
+                        </p>
+
+                    </div>
+
+
+                    <div class="pipeline-line"></div>
+
+
+                    <div class="pipeline-step">
+
+                        <div class="step-number">
+                            04
+                        </div>
+
+                        <div class="step-icon">
+                            ◎
+                        </div>
+
+                        <h4>ML MODEL</h4>
+
+                        <p>
+                            Machine learning model
+                            analyzes the content.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= TECHNOLOGY ================= -->
+
+            <section class="technology">
+
+                <div class="tech-item">
+                    <span class="tech-number">01</span>
+                    <span>PYTHON</span>
+                </div>
+
+                <div class="tech-item">
+                    <span class="tech-number">02</span>
+                    <span>FLASK</span>
+                </div>
+
+                <div class="tech-item">
+                    <span class="tech-number">03</span>
+                    <span>TF-IDF</span>
+                </div>
+
+                <div class="tech-item">
+                    <span class="tech-number">04</span>
+                    <span>LOGISTIC REGRESSION</span>
+                </div>
+
+                <div class="tech-item">
+                    <span class="tech-number">05</span>
+                    <span>NLP</span>
+                </div>
+
+            </section>
+
+
+            <!-- ================= FOOTER ================= -->
+
+            <footer>
+
+                <div class="footer-line"></div>
+
+                <div class="footer-content">
+
+                    <span>
+                        TRUTHLENS AI
+                    </span>
+
+                    <span>
+                        FAKE NEWS DETECTION SYSTEM
+                    </span>
+
+                    <span>
+                        © 2026
+                    </span>
+
+                </div>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- ================= WORD COUNTER ================= -->
+
+    <script>
+
+        const textarea = document.getElementById("news");
+        const counter = document.getElementById("wordCounter");
+
+        function updateWordCount() {
+
+            if (!textarea) return;
+
+            const text = textarea.value.trim();
+
+            if (text === "") {
+                counter.textContent = "0 WORDS";
+                return;
+            }
+
+            const words = text.split(/\s+/).length;
+
+            counter.textContent =
+                words + (words === 1 ? " WORD" : " WORDS");
+        }
+
+        textarea.addEventListener("input", updateWordCount);
+
+        updateWordCount();
+
+    </script>
+
+</body>
+
+</html>
