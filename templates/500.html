@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error – TruthLens AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="background-mesh"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="app-container">
+        <main class="main-content" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+            <div class="card glass-panel" style="text-align: center; max-width: 540px; padding: 48px;">
+                <div class="hero-badge" style="margin: 0 auto 16px;">
+                    <span class="badge-dot" style="background: #ef4444;"></span>
+                    <span>ERROR 500</span>
+                </div>
+                <h1 style="font-size: 2.4rem; margin-bottom: 12px; color: #f8fafc;">Internal Engine Error</h1>
+                <p style="color: #94a3b8; line-height: 1.6; margin-bottom: 28px;">
+                    An unexpected condition occurred while processing the news analysis request. Please try again or verify your service logs.
+                </p>
+                <a href="/" class="btn-primary" style="display: inline-flex;">Return to Dashboard →</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

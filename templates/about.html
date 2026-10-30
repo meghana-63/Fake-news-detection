@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="background-mesh"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-indigo"></div>
+
+    <div class="app-container">
+        <header class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="brand-names">
+                        <span class="brand-title">TRUTHLENS <span class="highlight">AI</span></span>
+                        <span class="brand-tag">INTELLIGENCE PLATFORM</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="/" class="nav-item">Home</a>
+                <a href="/about" class="nav-item active">About</a>
+                <a href="/how-it-works" class="nav-item">How It Works</a>
+                <a href="/history" class="nav-item">Scan History</a>
+            </nav>
+
+            <div class="nav-status">
+                <span class="status-indicator live"></span>
+                <span class="status-label">TruthLens v2.0 Active</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>MISSION &amp; ETHICAL MANIFESTO</span>
+                </div>
+                <h1 class="page-title">About <span class="gradient-text">TruthLens AI</span></h1>
+                <p class="page-subtitle">Democratizing media literacy through statistical linguistic analysis and real-time news index exploration.</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="card glass-panel">
+                    <div class="card-inner-header">
+                        <span class="section-tag">PROJECT PURPOSE</span>
+                        <h3>Bridging the Misinformation Divide</h3>
+                    </div>
+                    <p class="lead-text">
+                        In an era saturated with algorithmic content curation, sensationalism, and manufactured narratives, 
+                        evaluating the credibility of online news has become an urgent societal imperative.
+                    </p>
+                    <p>
+                        TruthLens AI was designed from first principles as an intelligent analytical workbench for journalists, 
+                        researchers, educators, and everyday readers. Rather than operating as an authoritative black box that imposes 
+                        binary "true" or "false" verdicts, TruthLens AI decomposes claims into structural linguistic markers and exposes 
+                        cross-source reporting from global news indexes.
+                    </p>
+                </div>
+
+                <div class="card glass-panel">
+                    <div class="card-inner-header">
+                        <span class="section-tag">ETHICAL COMMITMENT</span>
+                        <h3>Transparent, Unbiased Verification</h3>
+                    </div>
+                    <p class="lead-text">
+                        A fundamental principle of TruthLens AI is that no machine learning model or search API can act as an arbiter of factual truth.
+                    </p>
+                    <ul class="principles-list">
+                        <li>
+                            <strong>No Unsupported Verdicts:</strong> Statistical models classify vocabulary patterns, not real-world reality. We explicitly state when evidence is insufficient.
+                        </li>
+                        <li>
+                            <strong>Non-Dogmatic Search Indexing:</strong> The lack of search hits does not mean a statement is fabricated; it simply indicates absence from indexed mainstream publishers.
+                        </li>
+                        <li>
+                            <strong>Source Attribution:</strong> We never generate synthetic news excerpts or fabricate citations. All live articles reference their original publishers with direct links.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card glass-panel">
+                    <div class="card-inner-header">
+                        <span class="section-tag">TRAINING DATASET CONTEXT</span>
+                        <h3>Model Lineage &amp; Training Boundaries</h3>
+                    </div>
+                    <p>
+                        The core classification engine uses a supervised <strong>Logistic Regression</strong> classifier trained on 
+                        over 44,000 political and general news articles from the established ISOT News dataset (Fake.csv and True.csv).
+                    </p>
+                    <p>
+                        While the classifier achieved <strong>~98.9% test accuracy</strong> on historical data splits, real-world language 
+                        evolves continuously. For this reason, TruthLens AI pairs the static model with <strong>TheNewsAPI</strong> 
+                        live query integration, ensuring contemporary coverage is always surfaced to complement algorithmic pattern recognition.
+                    </p>
+                </div>
+
+                <div class="card glass-panel">
+                    <div class="card-inner-header">
+                        <span class="section-tag">PLATFORM STACK</span>
+                        <h3>Modern Full-Stack Architecture</h3>
+                    </div>
+                    <div class="tech-stack-tags">
+                        <span class="tag-pill">Python 3.14</span>
+                        <span class="tag-pill">Flask Microframework</span>
+                        <span class="tag-pill">Scikit-learn</span>
+                        <span class="tag-pill">TF-IDF Vectorization</span>
+                        <span class="tag-pill">TheNewsAPI REST Engine</span>
+                        <span class="tag-pill">SQLite Storage</span>
+                        <span class="tag-pill">CSS Glassmorphism</span>
+                        <span class="tag-pill">Vanilla JavaScript</span>
+                    </div>
+                    <p style="margin-top: 18px;">
+                        Built with a modular backend separating text processing, prediction inference, API networking, and database persistence.
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <span class="footer-brand">TRUTHLENS AI</span>
+                    <span class="footer-tagline">Intelligent Fake News Detection &amp; Live News Verification</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/how-it-works">How It Works</a>
+                    <a href="/history">History</a>
+                    <a href="/health" target="_blank">Health Check</a>
+                </div>
+                <div class="footer-right">
+                    <span>© 2026 TruthLens AI</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

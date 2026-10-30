@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="background-mesh"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-indigo"></div>
+
+    <div class="app-container">
+        <!-- TOP NAVIGATION -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="brand-names">
+                        <span class="brand-title">TRUTHLENS <span class="highlight">AI</span></span>
+                        <span class="brand-tag">INTELLIGENCE PLATFORM</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="/" class="nav-item">Home</a>
+                <a href="/about" class="nav-item">About</a>
+                <a href="/how-it-works" class="nav-item">How It Works</a>
+                <a href="/history" class="nav-item active">Scan History</a>
+            </nav>
+
+            <div class="nav-status">
+                <span class="status-indicator live"></span>
+                <span class="status-label">SQLite Database Active</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>AUDIT LOG &amp; ARCHIVE</span>
+                </div>
+                <h1 class="page-title">Scan <span class="gradient-text">History</span></h1>
+                <p class="page-subtitle">Inspect prior headlines analyzed by TruthLens AI. Review prediction metrics and external coverage summaries.</p>
+            </div>
+
+            <!-- STATS OVERVIEW -->
+            {% if stats %}
+            <div class="stats-strip">
+                <div class="stat-cell">
+                    <span class="stat-val">{{ stats.total_scans }}</span>
+                    <span class="stat-lbl">Total Scans</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-cell">
+                    <span class="stat-val">{{ stats.fake_scans }}</span>
+                    <span class="stat-lbl">Incongruent Scans</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-cell">
+                    <span class="stat-val">{{ stats.real_scans }}</span>
+                    <span class="stat-lbl">Credible Scans</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-cell">
+                    <span class="stat-val">{{ stats.average_confidence }}%</span>
+                    <span class="stat-lbl">Average Confidence</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="history-controls glass-panel">
+                <div class="search-box">
+                    <input type="text" id="historySearchInput" placeholder="Filter history by headline, label, or source...">
+                </div>
+                <div class="history-actions">
+                    <form action="/history/clear" method="POST" onsubmit="return confirm('Are you sure you want to clear your entire scan history? This action cannot be undone.');">
+                        <button type="submit" class="btn-danger" id="clearHistoryBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Clear History
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- HISTORY TABLE -->
+            <div class="card glass-panel">
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Analyzed Headline</th>
+                                <th>Model Prediction</th>
+                                <th>Confidence</th>
+                                <th>Live News Status</th>
+                                <th>Articles</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                            <tr class="history-row">
+                                <td class="hist-time">{{ item.created_at }}</td>
+                                <td class="hist-headline">
+                                    <span class="headline-text" title="{{ item.headline }}">{{ item.headline }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if 'REAL' in item.prediction_label %}badge-real
+                                        {% elif 'FAKE' in item.prediction_label %}badge-fake
+                                        {% else %}badge-neutral{% endif %}">
+                                        {{ item.prediction_label }}
+                                    </span>
+                                </td>
+                                <td class="hist-conf">
+                                    {% if item.confidence is not none %}
+                                    <strong>{{ item.confidence }}%</strong>
+                                    {% else %}
+                                    <span class="text-muted">–</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status-chip 
+                                        {% if 'RELATED' in item.live_status %}badge-high
+                                        {% elif 'INSUFFICIENT' in item.live_status %}badge-low
+                                        {% else %}badge-medium{% endif %}">
+                                        {{ item.live_status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="art-count-badge">{{ item.articles_count }}</span>
+                                </td>
+                                <td>
+                                    <form action="/analyze" method="POST">
+                                        <input type="hidden" name="news" value="{{ item.headline }}">
+                                        <button type="submit" class="tbl-action-btn" title="Re-analyze this news claim">
+                                            Re-Check ⚡
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-results-box">
+                    <div class="empty-icon">📁</div>
+                    <h4>No Scan History Available</h4>
+                    <p>You haven't run any analyses yet. Return to the home dashboard and analyze a news claim.</p>
+                    <a href="/" class="btn-primary" style="margin-top: 18px; display: inline-flex;">Go to Analyzer →</a>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <span class="footer-brand">TRUTHLENS AI</span>
+                    <span class="footer-tagline">Intelligent Fake News Detection &amp; Live News Verification</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/how-it-works">How It Works</a>
+                    <a href="/history">History</a>
+                    <a href="/health" target="_blank">Health Check</a>
+                </div>
+                <div class="footer-right">
+                    <span>© 2026 TruthLens AI</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Client-side search filter for history table
+        const searchInput = document.getElementById('historySearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.history-row');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

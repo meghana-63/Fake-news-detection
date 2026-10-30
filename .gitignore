@@ -1,5 +1,43 @@
-
+# Environment & Credentials
 .env
+.env.local
+.env.*.local
+
+# Virtual Environments
 venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Backups & Scratch
+backup/
+model/*_backup.pkl
+*.bak
+*.swp
+*.tmp
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Operating System & IDE artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

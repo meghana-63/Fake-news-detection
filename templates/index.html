@@ -1,478 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>TruthLens AI | Fake News Detection</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
+    <title>TruthLens AI – Intelligent Fake News Detection & Live News Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
+<body class="dark-theme">
+    <div class="background-mesh"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-indigo"></div>
 
-<body>
-
-    <!-- Background effects -->
-    <div class="background-grid"></div>
-    <div class="glow glow-one"></div>
-    <div class="glow glow-two"></div>
-
-    <div class="page">
-
-        <!-- ================= HEADER ================= -->
-
-        <header class="topbar">
-
-            <div class="brand">
-
-                <div class="brand-logo">
-                    <span>TL</span>
-                </div>
-
-                <div class="brand-text">
-                    <h1>TRUTHLENS <span>AI</span></h1>
-                    <p>INTELLIGENT NEWS ANALYSIS</p>
-                </div>
-
+    <div class="app-container">
+        <!-- TOP NAVIGATION -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="brand-names">
+                        <span class="brand-title">TRUTHLENS <span class="highlight">AI</span></span>
+                        <span class="brand-tag">INTELLIGENCE PLATFORM</span>
+                    </div>
+                </a>
             </div>
 
-            <div class="system-status">
-                <span class="status-dot"></span>
-                <span>AI SYSTEM ONLINE</span>
-            </div>
+            <nav class="nav-menu">
+                <a href="/" class="nav-item active">Home</a>
+                <a href="/about" class="nav-item">About</a>
+                <a href="/how-it-works" class="nav-item">How It Works</a>
+                <a href="/history" class="nav-item">Scan History</a>
+            </nav>
 
+            <div class="nav-status">
+                <span class="status-indicator live"></span>
+                <span class="status-label">NLP &amp; API Online</span>
+            </div>
         </header>
 
-
-        <!-- ================= HERO ================= -->
-
-        <main>
-
-            <section class="hero">
-
-                <div class="hero-tag">
-                    <span class="tag-line"></span>
-                    AI-POWERED CLASSIFICATION
-                    <span class="tag-line"></span>
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- HERO SECTION -->
+            <section class="hero-section">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>DUAL-ENGINE MISINFORMATION INTELLIGENCE</span>
                 </div>
-
-                <h2>
-    FAKE NEWS
-    <span>DETECTION SYSTEM</span>
-</h2>
-
-                <p class="hero-description">
-                    Analyze news content using Natural Language Processing,
-                    TF-IDF and Machine Learning.
+                <h1 class="hero-title">TRUTHLENS <span class="gradient-text">AI</span></h1>
+                <p class="hero-subtitle">Detect misinformation. Explore evidence. Make informed decisions.</p>
+                <p class="hero-desc">
+                    Combines supervised Machine Learning text classification with real-time cross-referencing via 
+                    <strong>TheNewsAPI</strong>. Inspect language patterns, evaluate live reporting, and review verified evidence side-by-side.
                 </p>
 
+                <!-- STATS STRIP -->
+                {% if stats %}
+                <div class="stats-strip">
+                    <div class="stat-cell">
+                        <span class="stat-val">{{ stats.total_scans }}</span>
+                        <span class="stat-lbl">Analyses Run</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-cell">
+                        <span class="stat-val">{{ stats.fake_scans }}</span>
+                        <span class="stat-lbl">Flagged Incongruent</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-cell">
+                        <span class="stat-val">{{ stats.real_scans }}</span>
+                        <span class="stat-lbl">Credible Patterns</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-cell">
+                        <span class="stat-val">{{ stats.average_confidence }}%</span>
+                        <span class="stat-lbl">Avg Confidence</span>
+                    </div>
+                </div>
+                {% endif %}
             </section>
 
-
-            <!-- ================= INPUT CARD ================= -->
-
-            <section class="analysis-card">
-
-                <div class="card-header">
-
-                    <div>
-                        <p class="section-number">01 / INPUT</p>
-                        <h3>Enter News Content</h3>
+            <!-- INPUT SECTION -->
+            <section class="input-card glass-panel" id="inputSection">
+                <div class="card-top-bar">
+                    <div class="card-heading">
+                        <span class="step-badge">STEP 01</span>
+                        <h2>Submit News Content</h2>
                     </div>
-
-                    <div class="terminal-icon">
-                        &gt;_
-                    </div>
-
+                    <span class="panel-tag">TEXT &amp; HEADLINE ANALYSIS</span>
                 </div>
 
-
-                <form action="/predict" method="POST">
-
-                    <div class="input-wrapper">
-
-                        <div class="input-top">
-
-                            <span class="input-label">
-                                NEWS CONTENT
-                            </span>
-
-                            <span class="input-hint">
-                                TEXT ANALYSIS
-                            </span>
-
-                        </div>
-
-                        <textarea
-                            name="news"
-                            id="news"
-                            placeholder="Paste a complete news headline or article here..."
-                            required>{{ request.form.get('news', '') }}</textarea>
-
-                        <div class="input-bottom">
-
-                            <span>
-                                NLP ENGINE READY
-                            </span>
-
-                            <span id="wordCounter">
-                                0 WORDS
-                            </span>
-
-                        </div>
-
+                {% if error %}
+                <div class="alert-box alert-error">
+                    <div class="alert-icon">⚠</div>
+                    <div class="alert-content">
+                        <strong>Input Notice</strong>
+                        <p>{{ error }}</p>
                     </div>
-
-
-                    <button type="submit" class="analyze-button">
-
-                        <span class="button-icon">✦</span>
-
-                        <span>ANALYZE NEWS</span>
-
-                        <span class="arrow">→</span>
-
-                    </button>
-
-                </form>
-
-            </section>
-
-
-            <!-- ================= RESULT ================= -->
-
-            {% if prediction %}
-
-            <section class="result-card">
-
-                <div class="result-header">
-
-                    <div>
-                        <p class="section-number">02 / ANALYSIS RESULT</p>
-                        <h3>Classification Complete</h3>
-                    </div>
-
-                    <div class="scan-status">
-                        SCAN COMPLETE
-                    </div>
-
                 </div>
-
-
-                <div class="result-content">
-
-                    <div class="result-icon
-                        {% if 'REAL' in prediction %}
-                            real-icon
-                        {% elif 'FAKE' in prediction %}
-                            fake-icon
-                        {% else %}
-                            uncertain-icon
-                        {% endif %}">
-
-                        {% if 'REAL' in prediction %}
-                            ✓
-                        {% elif 'FAKE' in prediction %}
-                            !
-                        {% else %}
-                            ?
-                        {% endif %}
-
-                    </div>
-
-
-                    <div class="result-main">
-
-                        <p class="result-label">
-                            PREDICTION
-                        </p>
-
-                        <h2 class="
-                            {% if 'REAL' in prediction %}
-                                real-text
-                            {% elif 'FAKE' in prediction %}
-                                fake-text
-                            {% else %}
-                                uncertain-text
-                            {% endif %}
-                        ">
-                            {{ prediction }}
-                        </h2>
-
-                        {% if confidence %}
-
-                        <div class="confidence-area">
-
-                            <div class="confidence-title">
-
-                                <span>MODEL CONFIDENCE</span>
-
-                                <strong>{{ confidence }}</strong>
-
-                            </div>
-
-                            <div class="confidence-bar">
-
-                                <div
-                                    class="confidence-fill"
-                                    style="width: {{ confidence }};">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-
-
-                {% if warning %}
-
-                <div class="warning-box">
-
-                    <span class="warning-symbol">⚠</span>
-
-                    <div>
-                        <strong>INSUFFICIENT INFORMATION</strong>
-                        <p>{{ warning }}</p>
-                    </div>
-
-                </div>
-
                 {% endif %}
 
+                <form action="/analyze" method="POST" id="newsForm">
+                    <div class="textarea-container">
+                        <textarea
+                            name="news"
+                            id="newsInput"
+                            rows="5"
+                            placeholder="Paste a news headline or article to analyze..."
+                            required
+                        >{{ news if news else '' }}</textarea>
+                        
+                        <div class="textarea-footer">
+                            <div class="counts">
+                                <span id="charCount">0 characters</span>
+                                <span class="sep">•</span>
+                                <span id="wordCount">0 words</span>
+                            </div>
+                            <div class="input-actions">
+                                <button type="button" class="btn-text" id="clearBtn" title="Clear text">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="result-note">
+                    <!-- QUICK SAMPLES -->
+                    <div class="sample-pills">
+                        <span class="sample-label">Try sample:</span>
+                        <button type="button" class="sample-pill" data-text="NASA confirms James Webb Space Telescope detected carbon compounds in distant exoplanet atmosphere">
+                            🛰 NASA Space Discovery
+                        </button>
+                        <button type="button" class="sample-pill" data-text="Federal Reserve signals gradual adjustment in interest rates following quarterly inflation review">
+                            📈 Fed Interest Rates
+                        </button>
+                        <button type="button" class="sample-pill" data-text="Secret alien military base uncovered beneath Antarctic ice sheet according to anonymous whistleblower">
+                            🛸 Alien Base Conspiracy
+                        </button>
+                    </div>
 
-                    <span>ⓘ</span>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="analyzeBtn">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text-main">Analyze News</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+                </form>
 
-                    <p>
-                        This prediction is generated from patterns learned
-                        from the training dataset. It does not independently
-                        verify facts or guarantee that a claim is true or false.
-                    </p>
-
+                <!-- DYNAMIC PROGRESS LOADING STATE -->
+                <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                    <div class="loading-card glass-panel">
+                        <div class="spinner-ring">
+                            <div class="spinner-core"></div>
+                        </div>
+                        <h3 id="loadingStatusText">Analyzing Content...</h3>
+                        <p class="loading-sub" id="loadingStepDetail">Extracting linguistic features &amp; querying TheNewsAPI live index</p>
+                        <div class="progress-track">
+                            <div class="progress-bar-inner" id="loadingProgressBar"></div>
+                        </div>
+                    </div>
                 </div>
-
             </section>
 
+            <!-- RESULTS DASHBOARD -->
+            {% if prediction and verification %}
+            <section class="results-dashboard" id="resultsSection">
+                <div class="dashboard-banner">
+                    <div class="banner-title">
+                        <span class="step-badge">STEP 02</span>
+                        <h2>Verification &amp; Intelligence Dossier</h2>
+                    </div>
+                    <div class="banner-meta">
+                        <span class="time-stamp">Generated: Real-Time</span>
+                    </div>
+                </div>
+
+                <!-- SECTION A: CLASSIFICATION RESULT -->
+                <div class="dashboard-grid">
+                    <div class="card glass-panel result-classification-card">
+                        <div class="card-inner-header">
+                            <span class="section-tag">A. CLASSIFICATION RESULT</span>
+                            <span class="engine-badge">ML PATTERN RECOGNITION</span>
+                        </div>
+
+                        <div class="prediction-display">
+                            {% set label = prediction.label %}
+                            <div class="prediction-hero 
+                                {% if 'REAL' in label %}hero-real
+                                {% elif 'FAKE' in label %}hero-fake
+                                {% else %}hero-neutral{% endif %}">
+                                
+                                <div class="prediction-symbol">
+                                    {% if 'REAL' in label %}✓
+                                    {% elif 'FAKE' in label %}✕
+                                    {% else %}?{% endif %}
+                                </div>
+                                <div class="prediction-text-block">
+                                    <span class="pred-kicker">MODEL CLASSIFICATION</span>
+                                    <h3 class="pred-label">{{ label }}</h3>
+                                    <span class="pred-state">{{ prediction.status|upper }}</span>
+                                </div>
+                            </div>
+
+                            {% if prediction.confidence is not none %}
+                            <div class="confidence-dashboard">
+                                <div class="conf-header">
+                                    <span>Model Confidence</span>
+                                    <span class="conf-percentage">{{ prediction.confidence }}%</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill {% if 'REAL' in label %}fill-real{% else %}fill-fake{% endif %}" 
+                                         style="width: {{ prediction.confidence }}%;"></div>
+                                </div>
+
+                                {% if prediction.real_probability is not none and prediction.fake_probability is not none %}
+                                <div class="probability-split">
+                                    <div class="split-cell">
+                                        <span class="split-label">Real Credibility Metric</span>
+                                        <span class="split-value real-accent">{{ prediction.real_probability }}%</span>
+                                    </div>
+                                    <div class="split-cell">
+                                        <span class="split-label">Sensationalism/Fake Metric</span>
+                                        <span class="split-value fake-accent">{{ prediction.fake_probability }}%</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div class="disclaimer-callout">
+                                <div class="callout-icon">ⓘ</div>
+                                <div class="callout-body">
+                                    <strong>MODEL LIMITATION WARNING</strong>
+                                    <p>{{ prediction.limitation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION B: VERIFICATION SUMMARY -->
+                    <div class="card glass-panel result-summary-card">
+                        <div class="card-inner-header">
+                            <span class="section-tag">B. VERIFICATION SUMMARY</span>
+                            <span class="engine-badge">CROSS-CHECK SNAPSHOT</span>
+                        </div>
+
+                        <div class="summary-matrix">
+                            <div class="matrix-row">
+                                <div class="matrix-label">
+                                    <span class="matrix-icon">🤖</span>
+                                    <span>AI Model Result</span>
+                                </div>
+                                <div class="matrix-value">
+                                    <span class="badge {% if 'REAL' in prediction.label %}badge-real{% elif 'FAKE' in prediction.label %}badge-fake{% else %}badge-neutral{% endif %}">
+                                        {{ prediction.label }} ({{ prediction.confidence if prediction.confidence is not none else 'N/A' }}%)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="matrix-row">
+                                <div class="matrix-label">
+                                    <span class="matrix-icon">🌐</span>
+                                    <span>Live Evidence Status</span>
+                                </div>
+                                <div class="matrix-value">
+                                    <span class="badge 
+                                        {% if 'RELATED' in verification.status %}badge-found
+                                        {% elif 'INSUFFICIENT' in verification.status %}badge-insufficient
+                                        {% else %}badge-unavailable{% endif %}">
+                                        {{ verification.status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="matrix-row">
+                                <div class="matrix-label">
+                                    <span class="matrix-icon">⚖️</span>
+                                    <span>Verification Status</span>
+                                </div>
+                                <div class="matrix-value">
+                                    <span class="badge {{ evidence.verification_status_badge if evidence else 'badge-unverified' }}">
+                                        {{ evidence.verification_status_label if evidence else 'Analysis Complete' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="summary-explanation">
+                                <p>{{ verification.message }}</p>
+                            </div>
+
+                            <div class="summary-notice">
+                                <p>
+                                    <strong>Important Guideline:</strong> Machine learning scores and search returns are tools 
+                                    to accelerate human judgment. Neither a model prediction nor a search return constitutes final proof.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION C: LIVE NEWS VERIFICATION -->
+                <div class="card glass-panel live-news-card">
+                    <div class="card-inner-header">
+                        <div>
+                            <span class="section-tag">C. LIVE NEWS VERIFICATION</span>
+                            <h3 class="section-title">TheNewsAPI Real-Time Coverage</h3>
+                        </div>
+                        <div class="api-meta">
+                            <span class="api-status-pill {% if verification.articles %}pill-active{% else %}pill-idle{% endif %}">
+                                {{ verification.status }}
+                            </span>
+                            <span class="count-tag">{{ verification.articles|length }} Articles Found</span>
+                        </div>
+                    </div>
+
+                    {% if verification.articles %}
+                    <div class="articles-grid">
+                        {% for art in verification.articles %}
+                        <article class="article-card glass-panel-inner">
+                            <div class="article-top">
+                                <span class="source-badge">{{ art.source }}</span>
+                                <span class="pub-date">{{ art.published }}</span>
+                            </div>
+
+                            <h4 class="article-title">{{ art.title }}</h4>
+
+                            <p class="article-desc">
+                                {{ art.description if art.description else 'No excerpt returned by publisher.' }}
+                            </p>
+
+                            <div class="article-meta-row">
+                                <div class="similarity-pill">
+                                    <span class="sim-label">Similarity:</span>
+                                    <strong class="sim-val">{{ art.similarity }}%</strong>
+                                </div>
+                                <span class="coverage-tag {{ art.coverage_type|lower|replace(' ', '-') }}">
+                                    {{ art.coverage_type }}
+                                </span>
+                            </div>
+
+                            {% if art.url and art.url != '#' %}
+                            <div class="article-link-box">
+                                <a href="{{ art.url }}" target="_blank" rel="noopener noreferrer" class="link-btn">
+                                    <span>Read Original Article</span>
+                                    <span class="link-arrow">↗</span>
+                                </a>
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-results-box">
+                        <div class="empty-icon">🔍</div>
+                        <h4>{{ verification.status }}</h4>
+                        <p>{{ verification.message }}</p>
+                        <p class="empty-clarification">
+                            No related articles were returned by the searched sources. This does not mean the claim is false.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- SECTION D: EVIDENCE COMPARISON -->
+                <div class="card glass-panel evidence-table-card">
+                    <div class="card-inner-header">
+                        <div>
+                            <span class="section-tag">D. EVIDENCE COMPARISON</span>
+                            <h3 class="section-title">Claim vs. External Source Matrix</h3>
+                        </div>
+                        <span class="panel-tag">CROSS-SOURCE ALIGNMENT</span>
+                    </div>
+
+                    <div class="original-claim-banner">
+                        <span class="claim-label">ORIGINAL CLAIM:</span>
+                        <p class="claim-text">"{{ news }}"</p>
+                    </div>
+
+                    {% if evidence.comparison_items %}
+                    <div class="table-responsive">
+                        <table class="evidence-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Publisher / Source</th>
+                                    <th>Article Headline</th>
+                                    <th>Date</th>
+                                    <th>Similarity</th>
+                                    <th>Alignment Category</th>
+                                    <th>Source Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in evidence.comparison_items %}
+                                <tr>
+                                    <td>{{ item.index }}</td>
+                                    <td><strong class="tbl-source">{{ item.source }}</strong></td>
+                                    <td class="tbl-headline">{{ item.title }}</td>
+                                    <td class="tbl-date">{{ item.published }}</td>
+                                    <td>
+                                        <div class="tbl-sim-bar">
+                                            <span>{{ item.similarity }}%</span>
+                                            <div class="mini-bar">
+                                                <div class="mini-fill" style="width: {{ item.similarity }}%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-chip {{ item.badge_class }}">
+                                            {{ item.alignment }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.url and item.url != '#' %}
+                                        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="tbl-link">
+                                            Inspect ↗
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">–</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="no-evidence-box">
+                        <p><strong>INSUFFICIENT EVIDENCE</strong></p>
+                        <p>
+                            No related articles were returned by the searched sources to populate a comparison table. 
+                            This does not mean the claim is false.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <div class="evidence-limits-box">
+                        <strong>Evidence Limitations:</strong>
+                        <p>
+                            Comparison percentages measure vocabulary and topical co-occurrence. They do not evaluate rhetorical irony, 
+                            satire, or subtle factual divergences. Always read the source text in full.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SECTION E: FINAL EXPLANATION -->
+                <div class="card glass-panel final-synthesis-card">
+                    <div class="card-inner-header">
+                        <div>
+                            <span class="section-tag">E. FINAL EXPLANATION</span>
+                            <h3 class="section-title">Objective Intelligence Synthesis</h3>
+                        </div>
+                        <span class="engine-badge">BALANCED ASSESSMENT</span>
+                    </div>
+
+                    <div class="synthesis-body">
+                        <div class="synthesis-text">
+                            <p class="lead-explanation">{{ evidence.explanation }}</p>
+                        </div>
+
+                        <div class="verdict-warning">
+                            <div class="warning-icon">⚖</div>
+                            <div class="warning-text">
+                                <strong>Ethical Verification Mandate:</strong>
+                                <p>
+                                    TruthLens AI intentionally avoids declaring an unsupported final factual verdict. 
+                                    Machine learning evaluates syntax and vocabulary patterns, while news APIs index contemporary coverage. 
+                                    The definitive determination of factual truth requires comprehensive investigative review.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             {% endif %}
 
-
-            <!-- ================= PIPELINE ================= -->
-
-            <section class="pipeline">
-
-                <div class="pipeline-heading">
-
-                    <div>
-                        <p class="section-number">03 / AI PIPELINE</p>
-                        <h3>How TruthLens AI Works</h3>
-                    </div>
-
-                    <span class="pipeline-status">
-                        PROCESSING FLOW
-                    </span>
-
+            <!-- HOW IT WORKS PIPELINE TEASER -->
+            <section class="pipeline-section glass-panel">
+                <div class="section-header-compact">
+                    <span class="section-tag">SYSTEM ARCHITECTURE</span>
+                    <h3>How TruthLens AI Evaluates Information</h3>
                 </div>
-
 
                 <div class="pipeline-grid">
-
-                    <div class="pipeline-step">
-
-                        <div class="step-number">
-                            01
-                        </div>
-
-                        <div class="step-icon">
-                            ◈
-                        </div>
-
-                        <h4>INPUT</h4>
-
-                        <p>
-                            News headline or article
-                            is submitted.
-                        </p>
-
+                    <div class="pipeline-card">
+                        <div class="pipe-num">01</div>
+                        <div class="pipe-icon">📝</div>
+                        <h4>Text Cleaning &amp; Preprocessing</h4>
+                        <p>Normalizes URLs, markup, punctuation, and casing matching model training specifications.</p>
                     </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="step-number">
-                            02
-                        </div>
-
-                        <div class="step-icon">
-                            ◌
-                        </div>
-
-                        <h4>PROCESSING</h4>
-
-                        <p>
-                            Text is cleaned and
-                            normalized.
-                        </p>
-
+                    <div class="pipeline-card">
+                        <div class="pipe-num">02</div>
+                        <div class="pipe-icon">🧮</div>
+                        <h4>TF-IDF Feature Space</h4>
+                        <p>Transforms raw tokens into 50,000 statistical n-gram feature vectors.</p>
                     </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="step-number">
-                            03
-                        </div>
-
-                        <div class="step-icon">
-                            ⬡
-                        </div>
-
-                        <h4>TF-IDF</h4>
-
-                        <p>
-                            Important text features
-                            are extracted.
-                        </p>
-
+                    <div class="pipeline-card">
+                        <div class="pipe-num">03</div>
+                        <div class="pipe-icon">🤖</div>
+                        <h4>Logistic Regression Classifier</h4>
+                        <p>Evaluates historical linguistic patterns with calibrated probabilistic confidence.</p>
                     </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="step-number">
-                            04
-                        </div>
-
-                        <div class="step-icon">
-                            ◎
-                        </div>
-
-                        <h4>ML MODEL</h4>
-
-                        <p>
-                            Machine learning model
-                            analyzes the content.
-                        </p>
-
+                    <div class="pipeline-card">
+                        <div class="pipe-num">04</div>
+                        <div class="pipe-icon">🛰</div>
+                        <h4>TheNewsAPI Live Search</h4>
+                        <p>Queries global news indexes in real-time to find corroborating or conflicting reporting.</p>
                     </div>
-
                 </div>
-
             </section>
-
-
-            <!-- ================= TECHNOLOGY ================= -->
-
-            <section class="technology">
-
-                <div class="tech-item">
-                    <span class="tech-number">01</span>
-                    <span>PYTHON</span>
-                </div>
-
-                <div class="tech-item">
-                    <span class="tech-number">02</span>
-                    <span>FLASK</span>
-                </div>
-
-                <div class="tech-item">
-                    <span class="tech-number">03</span>
-                    <span>TF-IDF</span>
-                </div>
-
-                <div class="tech-item">
-                    <span class="tech-number">04</span>
-                    <span>LOGISTIC REGRESSION</span>
-                </div>
-
-                <div class="tech-item">
-                    <span class="tech-number">05</span>
-                    <span>NLP</span>
-                </div>
-
-            </section>
-
-
-            <!-- ================= FOOTER ================= -->
-
-            <footer>
-
-                <div class="footer-line"></div>
-
-                <div class="footer-content">
-
-                    <span>
-                        TRUTHLENS AI
-                    </span>
-
-                    <span>
-                        FAKE NEWS DETECTION SYSTEM
-                    </span>
-
-                    <span>
-                        © 2026
-                    </span>
-
-                </div>
-
-            </footer>
-
         </main>
 
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <span class="footer-brand">TRUTHLENS AI</span>
+                    <span class="footer-tagline">Intelligent Fake News Detection &amp; Live News Verification</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/how-it-works">How It Works</a>
+                    <a href="/history">History</a>
+                    <a href="/health" target="_blank">System Health</a>
+                </div>
+                <div class="footer-right">
+                    <span>© 2026 TruthLens AI. Built for reliable media literacy.</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
-
-    <!-- ================= WORD COUNTER ================= -->
-
-    <script>
-
-        const textarea = document.getElementById("news");
-        const counter = document.getElementById("wordCounter");
-
-        function updateWordCount() {
-
-            if (!textarea) return;
-
-            const text = textarea.value.trim();
-
-            if (text === "") {
-                counter.textContent = "0 WORDS";
-                return;
-            }
-
-            const words = text.split(/\s+/).length;
-
-            counter.textContent =
-                words + (words === 1 ? " WORD" : " WORDS");
-        }
-
-        textarea.addEventListener("input", updateWordCount);
-
-        updateWordCount();
-
-    </script>
-
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
-
 </html>

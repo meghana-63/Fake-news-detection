@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="background-mesh"></div>
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-indigo"></div>
+
+    <div class="app-container">
+        <header class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                        </svg>
+                    </div>
+                    <div class="brand-names">
+                        <span class="brand-title">TRUTHLENS <span class="highlight">AI</span></span>
+                        <span class="brand-tag">INTELLIGENCE PLATFORM</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="/" class="nav-item">Home</a>
+                <a href="/about" class="nav-item">About</a>
+                <a href="/how-it-works" class="nav-item active">How It Works</a>
+                <a href="/history" class="nav-item">Scan History</a>
+            </nav>
+
+            <div class="nav-status">
+                <span class="status-indicator live"></span>
+                <span class="status-label">Pipeline Operational</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>TECHNICAL ARCHITECTURE</span>
+                </div>
+                <h1 class="page-title">How <span class="gradient-text">TruthLens AI</span> Works</h1>
+                <p class="page-subtitle">A deep dive into the dual-engine methodology combining NLP feature extraction and real-time news retrieval.</p>
+            </div>
+
+            <!-- STEP BY STEP PROCESS -->
+            <div class="pipeline-flow-vertical">
+                <!-- STEP 1 -->
+                <div class="flow-step glass-panel">
+                    <div class="step-num-col">
+                        <span class="step-circle">01</span>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-body">
+                        <div class="card-inner-header">
+                            <span class="section-tag">PREPROCESSING STAGE</span>
+                            <h3>Deterministic Text Normalization</h3>
+                        </div>
+                        <p>
+                            When text is submitted, it immediately passes through a deterministic text normalization pipeline that 
+                            matches the exact mathematical assumptions of the trained model:
+                        </p>
+                        <div class="code-box">
+                            <code>
+                                1. Convert text to lowercase.<br>
+                                2. Strip embedded URLs (http://, https://, www.*).<br>
+                                3. Eliminate HTML markup tags (&lt;div&gt;, &lt;p&gt;, etc.).<br>
+                                4. Strip standard ASCII punctuation marks.<br>
+                                5. Filter out numerical digit sequences.<br>
+                                6. Collapse redundant whitespace down to single spaces.
+                            </code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="flow-step glass-panel">
+                    <div class="step-num-col">
+                        <span class="step-circle">02</span>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-body">
+                        <div class="card-inner-header">
+                            <span class="section-tag">VECTORIZATION STAGE</span>
+                            <h3>50,000-Dimensional TF-IDF Space</h3>
+                        </div>
+                        <p>
+                            Cleaned text is vectorized using a pre-computed <strong>TfidfVectorizer</strong> vocabulary. 
+                            The vectorizer maps text into statistical n-grams (unigrams and bigrams), weighing distinctive vocabulary 
+                            while down-weighting ubiquitous stop words.
+                        </p>
+                        <p>
+                            This captures subtle linguistic markers, such as excessive emotional intensifiers, passive-voice ambiguity, 
+                            and stylistic patterns characteristic of manufactured or sensationalized news writing.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="flow-step glass-panel">
+                    <div class="step-num-col">
+                        <span class="step-circle">03</span>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-body">
+                        <div class="card-inner-header">
+                            <span class="section-tag">CLASSIFICATION STAGE</span>
+                            <h3>Logistic Regression &amp; Probability Calibration</h3>
+                        </div>
+                        <p>
+                            The feature vector is passed to the trained <strong>Logistic Regression</strong> classifier. 
+                            The model computes the decision boundary log-odds and applies the logistic sigmoid function to generate 
+                            posterior probabilities for both classes:
+                        </p>
+                        <div class="prob-calc-box">
+                            <div class="calc-item">
+                                <span class="calc-label">Class 0 (Fake News Pattern)</span>
+                                <span class="calc-desc">Indicates structural affinity with hyper-partisan or fabricated text.</span>
+                            </div>
+                            <div class="calc-item">
+                                <span class="calc-label">Class 1 (Real News Pattern)</span>
+                                <span class="calc-desc">Indicates stylistic parity with institutional, edited journalism.</span>
+                            </div>
+                        </div>
+                        <p class="callout-text">
+                            <strong>Note:</strong> High confidence represents high statistical certainty in pattern matching, 
+                            <em>never</em> an absolute guarantee of historical truth.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div class="flow-step glass-panel">
+                    <div class="step-num-col">
+                        <span class="step-circle">04</span>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="step-body">
+                        <div class="card-inner-header">
+                            <span class="section-tag">RETRIEVAL STAGE</span>
+                            <h3>Multi-Tier TheNewsAPI Verification</h3>
+                        </div>
+                        <p>
+                            Simultaneously, the system queries <strong>TheNewsAPI</strong>. To maximize recall across varying phrasing, 
+                            TruthLens AI executes a multi-query sequence:
+                        </p>
+                        <ol class="step-list">
+                            <li><strong>Full Clean Query:</strong> Searches using the original headline text to find direct syndicate matches.</li>
+                            <li><strong>Topical Keyword Query:</strong> Extracts key named entities and high-entropy keywords to uncover conceptual reporting.</li>
+                            <li><strong>Deduplication:</strong> Eliminates duplicate articles across publishers by tracking canonical URLs and normalized titles.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- STEP 5 -->
+                <div class="flow-step glass-panel">
+                    <div class="step-num-col">
+                        <span class="step-circle">05</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="card-inner-header">
+                            <span class="section-tag">SYNTHESIS STAGE</span>
+                            <h3>Evidence Alignment &amp; Objective Synthesis</h3>
+                        </div>
+                        <p>
+                            The system computes lexical overlap and Jaccard similarity between the claim and the retrieved news excerpts. 
+                            Articles are ranked and categorized into Supporting Coverage, Related Context, or Peripheral Mentions.
+                        </p>
+                        <p>
+                            Finally, TruthLens AI synthesizes the model's pattern classification and the real-time news findings 
+                            into a transparent dossier, empowering the reader to review original sources and draw their own verified conclusions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-left">
+                    <span class="footer-brand">TRUTHLENS AI</span>
+                    <span class="footer-tagline">Intelligent Fake News Detection &amp; Live News Verification</span>
+                </div>
+                <div class="footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/how-it-works">How It Works</a>
+                    <a href="/history">History</a>
+                    <a href="/health" target="_blank">Health Check</a>
+                </div>
+                <div class="footer-right">
+                    <span>© 2026 TruthLens AI</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,396 +1,266 @@
-from flask import Flask, render_template, request
-import joblib
-import re
-import string
-import requests
+"""TruthLens AI - Intelligent Fake News Detection & Live News Verification.
+
+Flask Application serving ML predictions, live news search via TheNewsAPI,
+transparent evidence comparison, and SQLite-backed scan history.
+"""
+
 import os
+import logging
+from typing import Dict, Any
+
 from dotenv import load_dotenv
-from difflib import SequenceMatcher
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    url_for,
+    flash
+)
+
+from utils.prediction import (
+    predict_news,
+    load_model_and_vectorizer,
+    get_model_status
+)
+from utils.news_api import verify_live_news
+from utils.evidence import build_evidence_analysis
+from database.db import (
+    init_db,
+    add_scan_record,
+    get_scan_history,
+    clear_scan_history,
+    get_history_stats
+)
+
+# -----------------------------------------------------------------------------
+# Configuration & Initialization
+# -----------------------------------------------------------------------------
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger("truthlens")
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "truthlens-ai-secure-key-2026")
 
-# ==========================================
-# LOAD ENVIRONMENT VARIABLES
-# ==========================================
-load_dotenv()
+# Directory paths
+MODEL_DIR = os.path.join(BASE_DIR, "model")
+MODEL_PATH = os.path.join(MODEL_DIR, "fake_news_model.pkl")
+VECTORIZER_PATH = os.path.join(MODEL_DIR, "tfidf_vectorizer.pkl")
 
-GNEWS_API_KEY = os.getenv("GNEWS_API_KEY")
+DB_DIR = os.path.join(BASE_DIR, "database")
+DB_PATH = os.path.join(DB_DIR, "history.db")
 
+# Initialize database schema
+init_db(DB_PATH)
 
-# ==========================================
-# LOAD ML MODEL
-# ==========================================
-model = joblib.load("model/fake_news_model.pkl")
-vectorizer = joblib.load("model/tfidf_vectorizer.pkl")
-
-
-# ==========================================
-# TEXT CLEANING
-# ==========================================
-def clean_text(text):
-    text = str(text).lower()
-
-    text = re.sub(
-        r"http\S+|www\S+|https\S+",
-        "",
-        text
-    )
-
-    text = re.sub(
-        r"<.*?>",
-        "",
-        text
-    )
-
-    text = text.translate(
-        str.maketrans(
-            "",
-            "",
-            string.punctuation
-        )
-    )
-
-    text = re.sub(
-        r"\d+",
-        "",
-        text
-    )
-
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    ).strip()
-
-    return text
+# Pre-load model and vectorizer at startup
+load_model_and_vectorizer(MODEL_PATH, VECTORIZER_PATH)
 
 
-# ==========================================
-# CREATE SEARCH QUERY
-# ==========================================
-def create_search_query(news):
-
-    # Remove URLs
-    text = re.sub(
-        r"http\S+|www\S+|https\S+",
-        "",
-        news
-    )
-
-    # Remove extra spaces
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    ).strip()
-
-    # Use first 15 words for live search
-    words = text.split()
-
-    query = " ".join(words[:15])
-
-    return query[:200]
+def get_api_token() -> str:
+    """Retrieve TheNewsAPI token from environment."""
+    return os.getenv("THENEWSAPI_TOKEN", "").strip()
 
 
-# ==========================================
-# LIVE NEWS VERIFICATION
-# ==========================================
-def verify_live_news(news):
+# -----------------------------------------------------------------------------
+# Web Routes
+# -----------------------------------------------------------------------------
 
-    if not GNEWS_API_KEY:
-        return {
-            "status": "API KEY MISSING",
-            "message": "Live news verification is not configured.",
-            "articles": []
-        }
-
-    query = create_search_query(news)
-
-    if not query:
-        return {
-            "status": "NOT VERIFIED",
-            "message": "No searchable news text was provided.",
-            "articles": []
-        }
-
-    url = "https://gnews.io/api/v4/search"
-
-    params = {
-        "q": query,
-        "lang": "en",
-        "country": "in",
-        "max": 5,
-        "apikey": GNEWS_API_KEY
-    }
-
-    try:
-
-        response = requests.get(
-            url,
-            params=params,
-            timeout=10
-        )
-
-        if response.status_code != 200:
-            return {
-                "status": "VERIFICATION UNAVAILABLE",
-                "message": "Live news service could not be reached.",
-                "articles": []
-            }
-
-        data = response.json()
-
-        articles = data.get("articles", [])
-
-        if not articles:
-            return {
-                "status": "NOT FOUND",
-                "message": (
-                    "No matching current news article "
-                    "was found."
-                ),
-                "articles": []
-            }
-
-        matched_articles = []
-
-        for article in articles:
-
-            title = article.get(
-                "title",
-                ""
-            )
-
-            description = article.get(
-                "description",
-                ""
-            )
-
-            source = article.get(
-                "source",
-                {}
-            )
-
-            source_name = source.get(
-                "name",
-                "Unknown source"
-            )
-
-            article_url = article.get(
-                "url",
-                "#"
-            )
-
-            published_at = article.get(
-                "publishedAt",
-                ""
-            )
-
-            searchable_article = (
-                title + " " + description
-            )
-
-            similarity = SequenceMatcher(
-                None,
-                news.lower(),
-                searchable_article.lower()
-            ).ratio()
-
-            matched_articles.append({
-                "title": title,
-                "description": description,
-                "source": source_name,
-                "url": article_url,
-                "published": published_at,
-                "similarity": round(
-                    similarity * 100,
-                    1
-                )
-            })
-
-        # Sort by similarity
-        matched_articles.sort(
-            key=lambda x: x["similarity"],
-            reverse=True
-        )
-
-        best_match = matched_articles[0]
-
-        if best_match["similarity"] >= 25:
-            status = "CURRENT SOURCES FOUND"
-            message = (
-                "Related current news reports "
-                "were found."
-            )
-        else:
-            status = "WEAK MATCH"
-            message = (
-                "Current articles were found, "
-                "but the match is weak."
-            )
-
-        return {
-            "status": status,
-            "message": message,
-            "articles": matched_articles[:3]
-        }
-
-    except requests.exceptions.RequestException:
-
-        return {
-            "status": "VERIFICATION UNAVAILABLE",
-            "message": (
-                "Could not connect to the live "
-                "news service."
-            ),
-            "articles": []
-        }
-
-    except Exception:
-
-        return {
-            "status": "VERIFICATION ERROR",
-            "message": (
-                "An unexpected verification error occurred."
-            ),
-            "articles": []
-        }
-
-
-# ==========================================
-# HOME PAGE
-# ==========================================
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
-
-    return render_template(
-        "index.html"
-    )
-
-
-# ==========================================
-# PREDICT
-# ==========================================
-@app.route(
-    "/predict",
-    methods=["POST"]
-)
-def predict():
-
-    news = request.form.get(
-        "news",
-        ""
-    ).strip()
-
-    # --------------------------------------
-    # EMPTY INPUT
-    # --------------------------------------
-    if not news:
-
-        return render_template(
-            "index.html",
-            prediction="Please enter some news.",
-            confidence="",
-            warning="",
-            live_status="",
-            live_message="",
-            live_articles=[]
-        )
-
-    # --------------------------------------
-    # MINIMUM WORD CHECK
-    # --------------------------------------
-    word_count = len(
-        news.split()
-    )
-
-    if word_count < 5:
-
-        return render_template(
-            "index.html",
-            prediction="INSUFFICIENT INFORMATION",
-            confidence="",
-            warning=(
-                "Please enter a complete news "
-                "headline or article."
-            ),
-            live_status="",
-            live_message="",
-            live_articles=[]
-        )
-
-    # ======================================
-    # ML PREDICTION
-    # ======================================
-
-    cleaned_news = clean_text(
-        news
-    )
-
-    news_tfidf = vectorizer.transform(
-        [cleaned_news]
-    )
-
-    prediction = model.predict(
-        news_tfidf
-    )[0]
-
-    probabilities = model.predict_proba(
-        news_tfidf
-    )[0]
-
-    fake_probability = (
-        probabilities[0] * 100
-    )
-
-    real_probability = (
-        probabilities[1] * 100
-    )
-
-    if prediction == 1:
-
-        result = "REAL NEWS"
-        confidence = real_probability
-
-    else:
-
-        result = "FAKE NEWS"
-        confidence = fake_probability
-
-    # ======================================
-    # LIVE NEWS VERIFICATION
-    # ======================================
-
-    live_result = verify_live_news(
-        news
-    )
-
-    # ======================================
-    # DISPLAY RESULTS
-    # ======================================
-
+    """Render the TruthLens AI home dashboard."""
+    stats = get_history_stats(DB_PATH)
     return render_template(
         "index.html",
-
-        prediction=result,
-
-        confidence=f"{confidence:.2f}%",
-
-        warning="",
-
-        live_status=live_result["status"],
-
-        live_message=live_result["message"],
-
-        live_articles=live_result["articles"]
+        stats=stats,
+        page_title="TruthLens AI – Misinformation Detection & Verification"
     )
 
 
-# ==========================================
-# RUN APPLICATION
-# ==========================================
-if __name__ == "__main__":
+@app.route("/predict", methods=["GET", "POST"])
+@app.route("/analyze", methods=["GET", "POST"])
+def analyze():
+    """Handle news analysis requests.
 
+    Supports both standard HTML form submissions and asynchronous JSON requests.
+    """
+    if request.method == "GET":
+        return redirect(url_for("home"))
+
+    # Extract input text from JSON or Form submission
+    if request.is_json:
+        data = request.get_json() or {}
+        news_input = data.get("news") or data.get("headline") or ""
+    else:
+        news_input = (
+            request.form.get("news")
+            or request.form.get("text")
+            or request.form.get("headline")
+            or request.form.get("article")
+            or ""
+        )
+
+    news_text = str(news_input).strip()
+
+    if not news_text:
+        error_msg = "Please enter a news headline or article to analyze."
+        if request.is_json:
+            return jsonify({"success": False, "error": error_msg}), 400
+        stats = get_history_stats(DB_PATH)
+        return render_template("index.html", error=error_msg, stats=stats)
+
+    if len(news_text) > 30000:
+        error_msg = "Input text exceeds character limit (30,000 characters). Please provide a shorter excerpt."
+        if request.is_json:
+            return jsonify({"success": False, "error": error_msg}), 400
+        stats = get_history_stats(DB_PATH)
+        return render_template("index.html", error=error_msg, news=news_text[:500], stats=stats)
+
+    # 1. Run Machine Learning Pattern Prediction
+    prediction = predict_news(news_text, MODEL_PATH, VECTORIZER_PATH)
+
+    # 2. Run Live News Search Verification
+    token = get_api_token()
+    verification = verify_live_news(news_text, token)
+
+    # 3. Build Evidence Comparison & Synthesis
+    evidence = build_evidence_analysis(news_text, prediction, verification)
+
+    # 4. Save analysis to SQLite history
+    top_source = (
+        verification["articles"][0].get("source")
+        if verification.get("articles")
+        else None
+    )
+    add_scan_record(
+        db_path=DB_PATH,
+        headline=news_text[:250],
+        prediction_label=prediction.get("label"),
+        confidence=prediction.get("confidence"),
+        fake_prob=prediction.get("fake_probability"),
+        real_prob=prediction.get("real_probability"),
+        live_status=verification.get("status"),
+        articles_count=len(verification.get("articles", [])),
+        top_source=top_source
+    )
+
+    stats = get_history_stats(DB_PATH)
+
+    # Return JSON for AJAX requests
+    if request.is_json:
+        return jsonify({
+            "success": True,
+            "headline": news_text,
+            "prediction": prediction,
+            "verification": verification,
+            "evidence": evidence,
+            "stats": stats
+        })
+
+    # Render HTML template for standard form submission
+    return render_template(
+        "index.html",
+        news=news_text,
+        prediction=prediction,
+        verification=verification,
+        evidence=evidence,
+        stats=stats
+    )
+
+
+@app.route("/history", methods=["GET"])
+def history_view():
+    """Display past news scans saved in SQLite."""
+    history = get_scan_history(DB_PATH, limit=100)
+    stats = get_history_stats(DB_PATH)
+    return render_template(
+        "history.html",
+        history=history,
+        stats=stats,
+        page_title="Scan History – TruthLens AI"
+    )
+
+
+@app.route("/history/clear", methods=["POST"])
+def clear_history_action():
+    """Clear all records from scan history."""
+    success = clear_scan_history(DB_PATH)
+    if request.is_json:
+        return jsonify({"success": success})
+    flash("Scan history cleared successfully." if success else "Failed to clear history.")
+    return redirect(url_for("history_view"))
+
+
+@app.route("/about", methods=["GET"])
+def about():
+    """Render the About page describing project background and methodology."""
+    return render_template(
+        "about.html",
+        page_title="About – TruthLens AI"
+    )
+
+
+@app.route("/how-it-works", methods=["GET"])
+def how_it_works():
+    """Render the How It Works page detailing the ML pipeline and live search."""
+    return render_template(
+        "how_it_works.html",
+        page_title="How It Works – TruthLens AI"
+    )
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    """Health check endpoint reporting application and dependency status.
+
+    Never exposes the raw API token.
+    """
+    token_loaded = bool(get_api_token())
+    model_info = get_model_status(MODEL_PATH, VECTORIZER_PATH)
+
+    status_code = 200 if (model_info["model_loaded"] and model_info["vectorizer_loaded"]) else 503
+
+    return jsonify({
+        "app": "TruthLens AI – Fake News Detection",
+        "status": "healthy" if status_code == 200 else "degraded",
+        "model_loaded": model_info["model_loaded"],
+        "vectorizer_loaded": model_info["vectorizer_loaded"],
+        "thenewsapi_token_loaded": token_loaded,
+        "database_connected": os.path.exists(DB_PATH),
+        "disclaimer": "Predictions are probabilistic and not proof of factual truth."
+    }), status_code
+
+
+# -----------------------------------------------------------------------------
+# Error Handling
+# -----------------------------------------------------------------------------
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    logger.exception("Internal application error: %s", error)
+    return render_template("500.html"), 500
+
+
+# -----------------------------------------------------------------------------
+# Main Entry Point
+# -----------------------------------------------------------------------------
+
+if __name__ == "__main__":
     app.run(
-        debug=True
+        host="127.0.0.1",
+        port=5000,
+        debug=False
     )
